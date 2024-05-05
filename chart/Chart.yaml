@@ -1,0 +1,5 @@
+apiVersion: v2
+name: azure-group-controller
+description: Reconciles group information from Azure to Kubernetes AzureGroup resources.
+version: 1.0.0
+appVersion: v0.1.0

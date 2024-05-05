@@ -1,0 +1,21 @@
+image: ghcr.io/kerwood/az-group-manager-controller
+tag: v0.1.0
+#
+# Controller log level, possible values: trace, debug, info, warn, error.
+logLevel: info
+
+# Enable structured logs.
+structuredLogs: true
+
+# Time between each reconciliation loop in seconds.
+reconcileTime: 300
+
+# Retry time in seconds if reconciliation fails.
+retryTime: 60
+
+# The name of the Kubernetes secret containing the following keys.
+# - tenant-id
+# - client-id
+# - client-secret
+azureConfig:
+  secretName: az-group-manager

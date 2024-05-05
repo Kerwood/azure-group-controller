@@ -1,0 +1,137 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: azuregroupmanagers.kerwood.github.com
+spec:
+  group: kerwood.github.com
+  names:
+    categories: []
+    kind: AzureGroupManager
+    plural: azuregroupmanagers
+    shortNames: []
+    singular: azuregroupmanager
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.groupUid
+      name: ID
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: Auto-generated derived type for AzureGroupManagerSpec via `CustomResource`
+        properties:
+          spec:
+            properties:
+              groupUid:
+                type: string
+            required:
+            - groupUid
+            type: object
+          status:
+            nullable: true
+            properties:
+              lastUpdate:
+                type: string
+            required:
+            - lastUpdate
+            type: object
+        required:
+        - spec
+        title: AzureGroupManager
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: azuregroups.kerwood.github.com
+spec:
+  group: kerwood.github.com
+  names:
+    categories: []
+    kind: AzureGroup
+    plural: azuregroups
+    shortNames: []
+    singular: azuregroup
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.count
+      name: COUNT
+      type: string
+    - jsonPath: .spec.id
+      name: ID
+      type: string
+    - jsonPath: .status.lastUpdate
+      name: LAST UPDATE
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: Auto-generated derived type for AzureGroupSpec via `CustomResource`
+        properties:
+          spec:
+            properties:
+              count:
+                format: uint
+                minimum: 0.0
+                type: integer
+              description:
+                nullable: true
+                type: string
+              displayName:
+                type: string
+              id:
+                type: string
+              mail:
+                nullable: true
+                type: string
+              members:
+                items:
+                  properties:
+                    displayName:
+                      type: string
+                    id:
+                      type: string
+                    mail:
+                      type: string
+                  required:
+                  - displayName
+                  - id
+                  - mail
+                  type: object
+                type: array
+            required:
+            - count
+            - displayName
+            - id
+            - members
+            type: object
+          status:
+            nullable: true
+            properties:
+              lastUpdate:
+                type: string
+            required:
+            - lastUpdate
+            type: object
+        required:
+        - spec
+        title: AzureGroup
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+

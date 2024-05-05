@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+members = [
+  "az_group_crd",
+  "az_group_manager_crd",
+  "az_group_manager",
+]
