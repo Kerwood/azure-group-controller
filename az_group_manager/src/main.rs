@@ -39,6 +39,15 @@ enum SubCommand {
         azure_client_secret: String,
 
         #[arg(
+            short = 'f',
+            long,
+            env,
+            help = "Read the Client Secret from a file.",
+            conflicts_with = "azure_client_secret"
+        )]
+        azure_client_secret_file_path: String,
+
+        #[arg(
             short = 'b',
             long,
             env,
@@ -63,8 +72,6 @@ enum SubCommand {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    // tracing_subscriber::fmt().init();
-
     let opt = Opt::parse();
     if opt.structured_logs {
         tracing_subscriber::fmt().json().init();
@@ -76,6 +83,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         SubCommand::Serve {
             azure_client_id,
             azure_client_secret,
+            azure_client_secret_file_path: _,
             azure_tenant_id,
             reconcile_time,
             retry_time,
