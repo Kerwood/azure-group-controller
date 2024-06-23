@@ -5,6 +5,7 @@ use az_group_crd::{AzureGroup, AzureGroupSpec, AzureGroupStatus};
 use chrono::prelude::*;
 use futures::StreamExt;
 use kube::api::{Patch, PatchParams};
+use kube::runtime::reflector::Lookup;
 use kube::{
     api::ObjectMeta,
     runtime::{
@@ -51,14 +52,10 @@ pub async fn run(cli_args: Args) -> Result<(), kube::Error> {
 async fn reconcile(manager: Arc<AzureGroupManager>, ctx: Arc<ReconcileContext>) -> Result<Action> {
     debug!("running reconcile for manager object: {}", manager.name_any());
 
-    // let members = get_members(&ctx.cli_args, &manager.spec.group_uid).await;
     match get_members(&ctx.cli_args, &manager.spec.group_uid).await {
-        Ok(group_response) => {
-            create_azure_group_resource(&group_response, &manager, &ctx.k8s_client).await?;
-            update_manager_status(&manager, &ctx.k8s_client).await?;
-        }
+        Ok(group_response) => create_azure_group_resource(&group_response, &manager, &ctx.k8s_client).await?,
         Err(err) => return Err(err),
-    }
+    };
 
     Ok(Action::requeue(Duration::from_secs(ctx.cli_args.reconcile_time)))
 }
@@ -68,6 +65,14 @@ fn error_policy(_object: Arc<AzureGroupManager>, err: &Error, ctx: Arc<Reconcile
     Action::requeue(Duration::from_secs(ctx.cli_args.retry_time))
 }
 
+/// Creates an AzureGroup resource in Kubernetes using the provided `GroupResponse` and `AzureGroupManager`.
+///
+/// Arguments
+///   * `g_response` - A reference to the `GroupResponse` containing the specifications for the Azure Group to be created.
+///   * `manager` - A reference to the `AzureGroupManager` for getting owner reference and namepace.
+///   * `k8s_client` - A reference to the `kube::Client` used to interact with the Kubernetes API server.
+///
+/// Returns a `Result<AzureGroup>` containing the Kubernetes resource.
 async fn create_azure_group_resource(
     g_response: &GroupResponse,
     manager: &AzureGroupManager,
@@ -95,42 +100,40 @@ async fn create_azure_group_resource(
         status: None,
     };
     let az_group_api = Api::<AzureGroup>::namespaced(k8s_client.clone(), namespace);
-    let result = az_group_api
-        .patch(
-            &group_slug_name,
-            &PatchParams::apply("azure-group-controller").force(),
-            &Patch::Apply(&az_group),
-        )
-        .await
-        .map_err(Error::AzureGroupCreationFailed)?;
+    let result = patch_azure_group(&group_slug_name, &az_group_api, az_group).await?;
+
+    patch_azure_group_status(&group_slug_name, &az_group_api).await?;
+
     return Ok(result);
 }
 
-async fn update_manager_status(
-    manager: &AzureGroupManager,
-    k8s_client: &kube::Client,
-) -> Result<AzureGroupManager> {
-    let namespace = manager
-        .metadata
-        .namespace
-        .as_ref()
-        .ok_or_else(|| Error::MissingObjectKey(".metadata.namespace"))?;
-
-    let az_group_manager_api = Api::<AzureGroupManager>::namespaced(k8s_client.clone(), namespace);
-
+async fn patch_azure_group_status(obj_name: &str, az_group_api: &Api<AzureGroup>) -> Result<AzureGroup> {
     let status = AzureGroupStatus {
         last_update: Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
     };
 
     let patch = json!({"status": status});
 
-    let status = az_group_manager_api
-        .patch_status(
-            &manager.name_any(),
-            &PatchParams::default(),
-            &Patch::Merge(&patch),
-        )
+    let status = az_group_api
+        .patch_status(obj_name, &PatchParams::default(), &Patch::Merge(&patch))
         .await?;
 
     return Ok(status);
+}
+
+async fn patch_azure_group(
+    obj_name: &str,
+    az_group_api: &Api<AzureGroup>,
+    az_group: AzureGroup,
+) -> Result<AzureGroup> {
+    let result = az_group_api
+        .patch(
+            obj_name,
+            &PatchParams::apply("azure-group-controller").force(),
+            &Patch::Apply(&az_group),
+        )
+        .await
+        .map_err(Error::AzureGroupCreationFailed)?;
+
+    return Ok(result);
 }

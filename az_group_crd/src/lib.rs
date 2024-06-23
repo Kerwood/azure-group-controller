@@ -12,8 +12,8 @@ use schemars::JsonSchema;
     namespaced,
     printcolumn = r#"{"name":"COUNT", "type":"string", "jsonPath":".spec.count"}"#,
     printcolumn = r#"{"name":"ID", "type":"string", "jsonPath":".spec.id"}"#,
-    // printcolumn = r#"{"name":"LAST UPDATE", "type":"string", "jsonPath":".status.lastUpdate"}"#,
-    // printcolumn = r#"{"name":"Age", "type":"date", "jsonPath":".metadata.creationTimestamp"}"#
+    printcolumn = r#"{"name":"LAST UPDATE", "type":"string", "jsonPath":".status.lastUpdate"}"#,
+    printcolumn = r#"{"name":"Age", "type":"date", "jsonPath":".metadata.creationTimestamp"}"#
 )]
 #[kube(status = "AzureGroupStatus")]
 #[serde(rename_all = "camelCase")]

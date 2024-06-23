@@ -9,9 +9,7 @@ use std::error::Error;
     kind = "AzureGroupManager",
     namespaced,
     printcolumn = r#"{"name":"ID", "type":"string", "jsonPath":".spec.groupUid"}"#,
-    printcolumn = r#"{"name":"LAST UPDATE", "type":"string", "jsonPath":".status.lastUpdate"}"#,
-    // printcolumn = r#"{"name":"ResourceID", "type":"string", "jsonPath":".spec.resourceId"}"#,
-    // printcolumn = r#"{"name":"Age", "type":"date", "jsonPath":".metadata.creationTimestamp"}"#
+    printcolumn = r#"{"name":"Age", "type":"date", "jsonPath":".metadata.creationTimestamp"}"#
 )]
 #[kube(status = "AzureGroupManagerStatus")]
 #[serde(rename_all = "camelCase")]
