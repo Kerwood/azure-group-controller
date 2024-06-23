@@ -59,6 +59,10 @@ async fn reconcile(manager: Arc<AzureGroupManager>, ctx: Arc<ReconcileContext>) 
 }
 
 fn error_policy(_object: Arc<AzureGroupManager>, err: &Error, ctx: Arc<ReconcileContext>) -> Action {
-    error!("ERROR POLICY: {}", err.to_string());
+    error!(
+        "{}, retrying in {} seconds.",
+        err.to_string(),
+        ctx.cli_args.retry_time
+    );
     Action::requeue(Duration::from_secs(ctx.cli_args.retry_time))
 }

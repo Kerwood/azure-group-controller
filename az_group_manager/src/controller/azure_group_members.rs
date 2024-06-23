@@ -4,7 +4,7 @@ use super::reconciler::Args;
 use az_group_crd::{AzureGroupSpec, Member};
 use azure_identity::client_credentials_flow;
 use slug::slugify;
-use tracing::error;
+use tracing::{debug, error, info};
 use url::Url;
 
 // Struct used for authentication against the Azure Graph API.
@@ -72,19 +72,22 @@ impl TryFrom<GroupResponseMember> for Member {
 
 impl TryFrom<GroupResponse> for AzureGroupSpec {
     type Error = CrateError;
-    fn try_from(gr: GroupResponse) -> Result<Self, Self::Error> {
-        if gr.id.is_none() {
+    fn try_from(group_response: GroupResponse) -> Result<Self, Self::Error> {
+        if group_response.id.is_none() {
             return Err(CrateError::IntoAzureGroupSpecFailed(
                 "field 'id' is None.".to_string(),
             ));
         }
 
-        if gr.display_name.is_none() {
-            let message = format!("field 'display_name' is None on group: {}", gr.id.unwrap());
+        if group_response.display_name.is_none() {
+            let message = format!(
+                "field 'display_name' is None on group: {}",
+                group_response.id.unwrap()
+            );
             return Err(CrateError::IntoAzureGroupSpecFailed(message));
         }
 
-        let (members_res, fails): (Vec<_>, Vec<_>) = gr
+        let (members_res, fails): (Vec<_>, Vec<_>) = group_response
             .members
             .into_iter()
             .map(|x| x.try_into())
@@ -93,14 +96,18 @@ impl TryFrom<GroupResponse> for AzureGroupSpec {
         fails.into_iter().for_each(|x| error!("{}", x.unwrap_err()));
         let members: Vec<Member> = members_res.into_iter().map(Result::unwrap).collect();
 
-        Ok(Self {
-            id: gr.id.unwrap(),
+        let result = Self {
+            id: group_response.id.unwrap(),
             count: members.len(),
             members,
-            description: gr.description,
-            mail: gr.mail,
-            display_name: gr.display_name.unwrap(),
-        })
+            description: group_response.description,
+            mail: group_response.mail,
+            display_name: group_response.display_name.unwrap(),
+        };
+
+        debug!("Converted GroupResponse to AzureGroupSpec {:?}", result);
+
+        Ok(result)
     }
 }
 
