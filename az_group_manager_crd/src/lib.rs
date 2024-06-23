@@ -1,6 +1,7 @@
+#[macro_use]
+extern crate serde_derive;
 use kube::{CustomResource, CustomResourceExt};
 use schemars::JsonSchema;
-use std::error::Error;
 
 #[derive(CustomResource, Debug, Serialize, Deserialize, Clone, JsonSchema)]
 #[kube(
@@ -23,6 +24,6 @@ pub struct AzureGroupManagerStatus {
     pub last_update: String,
 }
 
-pub fn print_crd() -> Result<String, Box<dyn Error>> {
+pub fn print_crd() -> Result<String, serde_yaml::Error> {
     Ok(serde_yaml::to_string(&AzureGroupManager::crd())?)
 }

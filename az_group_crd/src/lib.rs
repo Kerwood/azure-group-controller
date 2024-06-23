@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate serde_derive;
-use kube::CustomResource;
-use kube::CustomResourceExt;
+use kube::{CustomResource, CustomResourceExt};
 use schemars::JsonSchema;
 
 #[derive(CustomResource, Debug, Serialize, Deserialize, Clone, JsonSchema)]

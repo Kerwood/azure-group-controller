@@ -1,0 +1,15 @@
+[package]
+name = "az_group_manager_crd"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+kube = { version = "0.90", features = ["runtime", "derive"] }
+k8s-openapi = { version = "0.21", features = ["v1_28"] }
+serde = { version = "1.0.200", features = ["rc"] }
+serde_derive = "1.0.200"
+serde_json = "1.0.116"
+serde_yaml = "0.9.34"
+schemars = "0.8.17"

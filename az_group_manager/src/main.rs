@@ -2,8 +2,9 @@
 extern crate serde_derive;
 mod controller;
 use az_group_crd;
+use az_group_manager_crd;
 use clap::{Parser, Subcommand};
-use controller::{azure_group_manager_crd, reconciler};
+use controller::reconciler;
 use std::error::Error;
 
 use tracing::info;
@@ -89,7 +90,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             .await;
         }
         SubCommand::PrintCrd {} => {
-            let manager_crd = azure_group_manager_crd::print_crd().unwrap();
+            let manager_crd = az_group_manager_crd::print_crd().unwrap();
             let group_crd = az_group_crd::print_crd().unwrap();
             println!("{}\n---\n{}", manager_crd, group_crd);
         }

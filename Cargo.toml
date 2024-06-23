@@ -1,5 +1,6 @@
 [workspace]
 members = [
   "az_group_crd",
+  "az_group_manager_crd",
   "az_group_manager",
 ]
