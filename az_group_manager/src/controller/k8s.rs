@@ -5,7 +5,7 @@ use az_group_manager_crd::AzureGroupManager;
 use chrono::prelude::*;
 use kube::api::{Patch, PatchParams};
 use kube::{api::ObjectMeta, Api, Resource};
-// use tracing::{debug, error, info};
+use tracing::debug;
 
 /// Creates an AzureGroup resource in Kubernetes using the provided `GroupResponse` and `AzureGroupManager`.
 ///
@@ -48,7 +48,7 @@ pub async fn create_azure_group_resource(
 
     let result = patch_azure_group(&group_slug_name, &az_group_api, az_group).await?;
 
-    return Ok(result);
+    Ok(result)
 }
 
 async fn patch_azure_group(
@@ -65,10 +65,14 @@ async fn patch_azure_group(
         .await
         .map_err(Error::AzureGroupCreationFailed)?;
 
+    debug!("patched kubernetes object {} :: {:?}", obj_name, result);
+
     az_group_api
         .patch_status(obj_name, &PatchParams::default(), &Patch::Merge(&az_group))
         .await
         .map_err(Error::AzureGroupCreationFailed)?;
 
-    return Ok(result);
+    debug!("patched kubernetes status object {}", obj_name);
+
+    Ok(result)
 }

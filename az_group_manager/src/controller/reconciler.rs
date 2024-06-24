@@ -12,13 +12,13 @@ use kube::{
     Api, Client, ResourceExt,
 };
 use std::{sync::Arc, time::Duration};
-use tracing::{debug, error, info};
+use tracing::{debug, error};
 
 #[derive(Debug, Clone)]
 pub struct Args {
-    pub azure_tenant_id: String,
-    pub azure_client_id: String,
-    pub azure_client_secret: String,
+    pub az_tenant_id: String,
+    pub az_client_id: String,
+    pub az_client_secret: String,
     pub reconcile_time: u64,
     pub retry_time: u64,
 }

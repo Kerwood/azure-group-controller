@@ -25,5 +25,5 @@ pub struct AzureGroupManagerStatus {
 }
 
 pub fn print_crd() -> Result<String, serde_yaml::Error> {
-    Ok(serde_yaml::to_string(&AzureGroupManager::crd())?)
+    serde_yaml::to_string(&AzureGroupManager::crd())
 }

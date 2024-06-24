@@ -1,8 +1,6 @@
 #[macro_use]
 extern crate serde_derive;
 mod controller;
-use az_group_crd;
-use az_group_manager_crd;
 use clap::{Parser, Subcommand, ValueEnum};
 use controller::reconciler;
 use std::error::Error;
@@ -40,13 +38,13 @@ enum SubCommand {
     /// Start the service.
     Serve {
         #[arg(short = 't', long, env, help = "Azure Tenant ID.")]
-        azure_tenant_id: String,
+        az_tenant_id: String,
 
-        #[arg(short = 'i', long, env, help = "Service Principal Client ID.")]
-        azure_client_id: String,
+        #[arg(short = 'i', long, env, help = "Azure App Registration Client ID.")]
+        az_client_id: String,
 
-        #[arg(short = 's', long, env, help = "Service Principal Client Secret.")]
-        azure_client_secret: String,
+        #[arg(short = 's', long, env, help = "Azure App Registration Client Secret.")]
+        az_client_secret: String,
 
         #[arg(
             short = 'b',
@@ -106,17 +104,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     match opt.command {
         SubCommand::Serve {
-            azure_client_id,
-            azure_client_secret,
-            azure_tenant_id,
+            az_client_id,
+            az_client_secret,
+            az_tenant_id,
             reconcile_time,
             retry_time,
         } => {
             info!("Running application!");
             _ = reconciler::run(reconciler::Args {
-                azure_tenant_id,
-                azure_client_id,
-                azure_client_secret,
+                az_tenant_id,
+                az_client_id,
+                az_client_secret,
                 reconcile_time: reconcile_time.parse()?,
                 retry_time: retry_time.parse()?,
             })

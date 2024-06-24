@@ -37,10 +37,8 @@ pub struct GroupResponse {
 
 impl GroupResponse {
     pub fn slug_display_name(&self) -> Option<String> {
-        if self.display_name.is_none() {
-            return None;
-        }
-        self.display_name.clone().map(|x| slugify(x))
+        self.display_name.as_ref()?;
+        self.display_name.clone().map(slugify)
     }
 }
 
@@ -105,8 +103,6 @@ impl TryFrom<GroupResponse> for AzureGroupSpec {
             display_name: group_response.display_name.unwrap(),
         };
 
-        debug!("Converted GroupResponse to AzureGroupSpec {:?}", result);
-
         Ok(result)
     }
 }
@@ -117,10 +113,10 @@ pub async fn get_members(args: &Args, group_uuid: &String) -> Result<GroupRespon
     // This will give you the final token to use in authorization.
     let token = client_credentials_flow::perform(
         http_client.clone(),
-        &args.azure_client_id,
-        &args.azure_client_secret,
+        &args.az_client_id,
+        &args.az_client_secret,
         &["https://graph.microsoft.com/.default"],
-        &args.azure_tenant_id,
+        &args.az_tenant_id,
     )
     .await?;
 
@@ -141,6 +137,11 @@ pub async fn get_members(args: &Args, group_uuid: &String) -> Result<GroupRespon
         .json::<GroupResponse>()
         .await?;
 
+    debug!(
+        "https://graph.microsoft.com/v1.0/groups/{}/members :: {:?}",
+        group_uuid, members_resp
+    );
+
     // Get basic information about the group.
     let group_info_url = Url::parse(&format!("https://graph.microsoft.com/v1.0/groups/{}", group_uuid))?;
     let group_info_resp = reqwest::Client::new()
@@ -154,6 +155,11 @@ pub async fn get_members(args: &Args, group_uuid: &String) -> Result<GroupRespon
         .error_for_status()?
         .json::<GroupInfoResponse>()
         .await?;
+
+    debug!(
+        "https://graph.microsoft.com/v1.0/groups/{} :: {:?}",
+        group_uuid, group_info_resp
+    );
 
     let result = GroupResponse {
         id: Some(group_uuid.to_string()),
