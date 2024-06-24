@@ -4,7 +4,7 @@ use super::reconciler::Args;
 use az_group_crd::{AzureGroupSpec, Member};
 use azure_identity::client_credentials_flow;
 use slug::slugify;
-use tracing::{debug, error, info};
+use tracing::{debug, error};
 use url::Url;
 
 // Struct used for authentication against the Azure Graph API.

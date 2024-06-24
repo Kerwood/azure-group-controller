@@ -1,4 +1,4 @@
-use super::azure_group_members;
+use super::azure;
 use super::error::{Error, Result};
 use super::k8s;
 use az_group_crd::AzureGroup;
@@ -48,7 +48,7 @@ pub async fn run(cli_args: Args) -> Result<(), kube::Error> {
 async fn reconcile(manager: Arc<AzureGroupManager>, ctx: Arc<ReconcileContext>) -> Result<Action> {
     debug!("running reconcile for manager object: {}", manager.name_any());
 
-    match azure_group_members::get_members(&ctx.cli_args, &manager.spec.group_uid).await {
+    match azure::get_members(&ctx.cli_args, &manager.spec.group_uid).await {
         Ok(group_response) => {
             k8s::create_azure_group_resource(&group_response, &manager, &ctx.k8s_client).await?
         }

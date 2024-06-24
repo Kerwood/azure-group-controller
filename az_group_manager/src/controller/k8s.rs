@@ -1,4 +1,4 @@
-use super::azure_group_members::GroupResponse;
+use super::azure::GroupResponse;
 use super::error::{Error, Result};
 use az_group_crd::{AzureGroup, AzureGroupSpec, AzureGroupStatus};
 use az_group_manager_crd::AzureGroupManager;
