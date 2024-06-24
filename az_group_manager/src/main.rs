@@ -3,12 +3,11 @@ extern crate serde_derive;
 mod controller;
 use az_group_crd;
 use az_group_manager_crd;
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use controller::reconciler;
 use std::error::Error;
 
-use tracing::info;
-use tracing_subscriber;
+use tracing::{info, Level};
 
 #[derive(Parser, Debug)]
 #[command(
@@ -22,8 +21,18 @@ struct Opt {
     #[command(subcommand)]
     pub command: SubCommand,
 
-    #[arg(short = 's', long, env, help = "Logs will be output as JSON.")]
+    #[arg(long, env, help = "Logs will be output as JSON.", global = true)]
     structured_logs: bool,
+
+    #[arg(
+        short = 'l',
+        long,
+        env,
+        default_value = "info",
+        help = "Log Level.",
+        global = true
+    )]
+    log_level: LogLevel,
 }
 
 #[derive(Subcommand, Debug)]
@@ -62,14 +71,38 @@ enum SubCommand {
     PrintCrd {},
 }
 
+#[derive(Debug, Clone, ValueEnum)]
+enum LogLevel {
+    Trace,
+    Debug,
+    Info,
+    Warn,
+    Error,
+}
+
+impl From<LogLevel> for Level {
+    fn from(log_level: LogLevel) -> Self {
+        match log_level {
+            LogLevel::Trace => Level::TRACE,
+            LogLevel::Debug => Level::DEBUG,
+            LogLevel::Info => Level::INFO,
+            LogLevel::Warn => Level::WARN,
+            LogLevel::Error => Level::ERROR,
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let opt = Opt::parse();
-    if opt.structured_logs {
-        tracing_subscriber::fmt().json().init();
-    } else {
-        tracing_subscriber::fmt().init();
-    }
+
+    let log_level: Level = opt.log_level.into();
+    let subscriber_builder = tracing_subscriber::fmt().with_max_level(log_level);
+
+    match opt.structured_logs {
+        true => subscriber_builder.json().init(),
+        false => subscriber_builder.init(),
+    };
 
     match opt.command {
         SubCommand::Serve {
