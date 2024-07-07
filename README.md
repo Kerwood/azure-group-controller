@@ -2,6 +2,8 @@
 
 [![forthebadge made-with-rust](http://ForTheBadge.com/images/badges/made-with-rust.svg)](https://www.rust-lang.org/)
 
+![Image Size](https://ghcr-badge.egpl.dev/kerwood/azure-group-controller/size?tag=latest)
+
 A Kubernetes controller that creates a `AzureGroup` resource with a list of members and some basic information on the group.  
 The controller will continuously reonconsile the `AzureGroup` resource.
 
