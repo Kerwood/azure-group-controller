@@ -1,5 +1,5 @@
 [package]
-name = "az_group_manager"
+name = "az-group-manager"
 version = "0.1.0"
 edition = "2021"
 description = "Fetch members from Azure AD groups and populate the result to an AzureGroup resource."
@@ -29,3 +29,4 @@ serde = { version = "1.0.200", features = ["rc"] }
 serde_derive = "1.0.200"
 schemars = "0.8.17"
 slug = "0.1.5"
+openssl = { version = "0.10.64", features = ["vendored"] }

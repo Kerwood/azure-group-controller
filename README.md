@@ -2,7 +2,7 @@
 
 [![forthebadge made-with-rust](http://ForTheBadge.com/images/badges/made-with-rust.svg)](https://www.rust-lang.org/)
 
-A Kubernetes controller that creates a `AzureGroup` resource with a list of members and some basic information on the group.
+A Kubernetes controller that creates a `AzureGroup` resource with a list of members and some basic information on the group.  
 The controller will continuously reonconsile the `AzureGroup` resource.
 
 ## Prerequisites
@@ -21,7 +21,7 @@ For developing:
 ## Install
 
 Start be creating a default App Registration in your Azure tenant. Don't chose any Platform, just give it a name.  
-Add the `GroupMember.Read.All` and `User.ReadBasic.All` Application Permissions to the App Registration and create a new client secret.
+Add the `GroupMember.Read.All` and `User.ReadBasic.All` Application Permissions to the App Registration and create a new client secret.  
 If the maximun expiration date of years is not enough for you, use the `az` cli to set as many years as you want.
 
 Create a Kubernetes secret in your cluster containing the Azure tenant, client ID and secret.
