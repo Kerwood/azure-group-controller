@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: az-group-manager-controller
+rules:
+  - apiGroups:
+      - kerwood.github.com
+    resources:
+      - azuregroupmanagers
+    verbs:
+      - get
+      - watch
+      - list
+
+  - apiGroups:
+      - kerwood.github.com
+    resources:
+      - azuregroupmanagers
+      - azuregroups/status
+    verbs:
+      - "*"

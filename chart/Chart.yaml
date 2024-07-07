@@ -1,0 +1,5 @@
+apiVersion: v2
+name: azure-group-controller
+description: Creates a AzureGroup resources with basic information about a group.
+version: 1.0.0
+appVersion: v1.0.0
