@@ -45,7 +45,7 @@ helm repo update
 Install the controller.
 
 ```
-helm install az-group-manager kerwood/az-group-manager --namespace <namespace>
+helm install az-group-manager kerwood/az-group-controller --namespace <namespace>
 ```
 
 ## How to use it
